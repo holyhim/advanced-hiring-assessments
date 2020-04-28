@@ -10,7 +10,7 @@ describe('Advanced Web Hiring Assessments - Server', () => {
   let db;
 
   describe('POST /signin', () => {
-    beforeEach(done => {
+    beforeEach((done) => {
       db = new sqlite3.Database(
         './database/.test.sqlite',
         sqlite3.OPEN_READWRITE
@@ -24,97 +24,102 @@ describe('Advanced Web Hiring Assessments - Server', () => {
           'coding.kim@codestates.com',
           'switzerland',
           'coding kim',
-          '010-1234-5678'
+          '010-1234-5678',
         ]
       );
       done();
     });
 
-    afterEach(done => {
+    afterEach((done) => {
       db.close();
       done();
     });
 
-    test('it should respond 200 status code with user id to signin data', async () => {
+    test('it should respond 200 status code with user id to signin data', async (done) => {
       const response = await agent.post('/signin').send({
         email: 'coding.kim@codestates.com',
-        password: 'switzerland'
+        password: 'switzerland',
       });
 
       expect(response.status).toBe(200);
       expect(response.body.id).not.toBe(undefined);
+
+      done();
     });
 
-    test('it should respond 404 status code with unvalid user text', async () => {
+    test('it should respond 404 status code with unvalid user text', async (done) => {
       const response = await agent.post('/signin').send({
         email: 'coding.kim@javascript.com',
-        password: 'helloWorld'
+        password: 'helloWorld',
       });
 
       expect(response.status).toBe(404);
       expect(response.text).toBe('unvalid user');
+      done();
     });
   });
 
   describe('POST /signup', () => {
-    test('it should response 201 status code with user info to signup data', async () => {
+    test('it should response 201 status code with user info to signup data', async (done) => {
       const response = await agent.post('/signup').send({
         email: 'testuser@gmail.com',
         password: 'test',
         username: 'testuser',
-        mobile: '010-0987-6543'
+        mobile: '010-0987-6543',
       });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('id', 'username', 'email');
+      done();
     });
 
-    test('it should 409(conflict) status code with existing user email', async () => {
+    test('it should 409(conflict) status code with existing user email', async (done) => {
       const response = await agent.post('/signup').send({
         email: 'coding.kim@codestates.com',
-        password: 'foo'
+        password: 'foo',
       });
 
       expect(response.status).toBe(409);
       expect(response.text).toBe('email exists');
+      done();
     });
   });
   describe('GET /user', () => {
-    beforeEach(done => {
+    beforeEach((done) => {
       authenticatedUser
         .post('/signin')
         .send({
           email: 'coding.kim@codestates.com',
-          password: 'switzerland'
+          password: 'switzerland',
         })
         .then(() => {
           done();
         });
     });
-    test('it should return user data with request of session.userid', done => {
-      authenticatedUser.get('/user').end(function(err, res2) {
+    test('it should return user data with request of session.userid', (done) => {
+      authenticatedUser.get('/user').end(function (err, res2) {
         expect(res2.status).toBe(200);
         expect(res2.body).toHaveProperty('id', 'email', 'username');
         done();
       });
     });
 
-    test('it should return Unauthorized if request without session.userid', done => {
+    test('it should return Unauthorized if request without session.userid', (done) => {
       const authenticateFailedUser = request.agent(app);
       authenticateFailedUser
         .post('/signin')
         .send({
           email: 'coding.kim@codestates.com',
-          password: 'korea'
+          password: 'korea',
         })
-        .then(function(res) {
+        .then(function (res) {
           authenticateFailedUser
             .get('/user')
-            .then(function(res2) {
+            .then(function (res2) {
               expect(res2.status).toBe(401);
               done();
             })
-            .catch(err => {
+            .catch((err) => {
               done(err);
             });
         });
