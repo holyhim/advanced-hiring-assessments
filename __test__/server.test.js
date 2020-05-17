@@ -47,14 +47,14 @@ describe('Advanced Web Hiring Assessments - Server', () => {
       done();
     });
 
-    test('it should respond 404 status code with unvalid user text', async (done) => {
+    test('it should respond 404 status code with invalid user text', async (done) => {
       const response = await agent.post('/signin').send({
         email: 'coding.kim@javascript.com',
         password: 'helloWorld',
       });
 
       expect(response.status).toBe(404);
-      expect(response.text).toBe('unvalid user');
+      expect(response.text).toBe('invalid user');
       done();
     });
   });
